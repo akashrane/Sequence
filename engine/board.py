@@ -3,13 +3,15 @@ import random
 from .models import Card, Rank, Suit, BoardState
 
 class Board:
-    def __init__(self, layout_type: str = "standard"):
+    def __init__(self, rng: random.Random, layout_type: str = "standard"):
         self.rows = 10
         self.cols = 10
         self.grid: List[List[Optional[Card]]] = [[None for _ in range(self.cols)] for _ in range(self.rows)]
         self.state: List[List[Optional[int]]] = [[None for _ in range(self.cols)] for _ in range(self.rows)]
         self.locked: List[List[bool]] = [[False for _ in range(self.cols)] for _ in range(self.rows)]
+        self.locked: List[List[bool]] = [[False for _ in range(self.cols)] for _ in range(self.rows)]
         self.card_positions: Dict[str, List[Tuple[int, int]]] = {}
+        self.rng = rng
 
         if layout_type == "random":
             self._generate_random_layout()
@@ -83,7 +85,7 @@ class Board:
                 deck_cards.append(Card(rank, suit))
                 deck_cards.append(Card(rank, suit))
         
-        random.shuffle(deck_cards)
+        self.rng.shuffle(deck_cards)
         
         # Reset
         self.grid = [[None]*10 for _ in range(10)]

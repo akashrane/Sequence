@@ -31,7 +31,7 @@ class SequenceAI:
         
         if not all_moves:
             return None
-        return random.choice(all_moves)
+        return game.rng.choice(all_moves)
 
     @staticmethod
     def get_smart_move(game, player):

@@ -41,8 +41,9 @@ class Card:
         return self.rank == Rank.JACK and self.suit in [Suit.HEARTS, Suit.SPADES]
 
 class Deck:
-    def __init__(self):
+    def __init__(self, rng: random.Random):
         self.cards: List[Card] = []
+        self.rng = rng
         self._initialize_deck()
     
     def _initialize_deck(self):
@@ -51,7 +52,7 @@ class Deck:
             for suit in Suit:
                 for rank in Rank:
                     self.cards.append(Card(rank, suit))
-        random.shuffle(self.cards)
+        self.rng.shuffle(self.cards)
 
     def draw(self) -> Optional[Card]:
         return self.cards.pop() if self.cards else None

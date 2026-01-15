@@ -2,11 +2,18 @@ from typing import List, Tuple, Dict, Optional
 from .models import Card, Deck, Player, BoardState, Rank, Suit
 from .board import Board
 
+import random
+
 class SequenceGame:
-    def __init__(self, num_players: int = 2, board_type: str = "standard", teams: bool = True):
+    def __init__(self, num_players: int = 2, board_type: str = "standard", teams: bool = True, seed: Optional[int] = None):
+        if seed is None:
+            seed = random.randint(0, 999999)
+        self.seed = seed
+        self.rng = random.Random(seed)
+        
         self.num_players = num_players
-        self.board = Board(layout_type=board_type)
-        self.deck = Deck()
+        self.board = Board(self.rng, layout_type=board_type)
+        self.deck = Deck(self.rng)
         self.players: List[Player] = []
         self.current_turn_index = 0
         self.log: List[dict] = []

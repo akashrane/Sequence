@@ -14,7 +14,8 @@ class SimulationRunner:
         start_time = time.time()
         
         for i in range(num_games):
-            game = SequenceGame(num_players=2, board_type=board_type, teams=teams)
+            seed = i + int(time.time()) # Simple unique seed
+            game = SequenceGame(num_players=2, board_type=board_type, teams=teams, seed=seed)
             game.players[0].strategy = strategy_p1
             game.players[1].strategy = strategy_p2
             
