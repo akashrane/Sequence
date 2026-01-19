@@ -13,7 +13,19 @@ export const useGameWebSocket = (roomCode: string | undefined) => {
         if (!roomCode) return;
 
         // Connect
-        const socketUrl = `ws://localhost:8000/ws/${roomCode}`;
+        // Connect
+        const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+        let socketUrl = `ws://localhost:8000/ws/${roomCode}`;
+
+        try {
+            // Construct URL object (handling relative paths by providing window.location.origin as base)
+            const url = new URL(apiBase, window.location.origin);
+            const protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
+            socketUrl = `${protocol}//${url.host}/ws/${roomCode}`;
+        } catch (e) {
+            console.warn("Invalid API_URL, falling back to localhost", e);
+        }
+
         console.log(`Connecting to ${socketUrl}...`);
 
         ws.current = new WebSocket(socketUrl);
