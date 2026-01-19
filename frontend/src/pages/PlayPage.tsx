@@ -197,7 +197,7 @@ const PlayPage: React.FC = () => {
                     {/* Board Area (Takes remaining space) */}
                     <div className="flex-1 w-full flex items-center justify-center p-4 overflow-hidden relative">
                         {/* Scale wrapper */}
-                        <div className="scale-[0.6] sm:scale-[0.75] md:scale-[0.85] lg:scale-[1.0] xl:scale-[1.1] 2xl:scale-[1.25] transition-transform duration-500">
+                        <div className="scale-[0.55] sm:scale-[0.65] md:scale-[0.75] lg:scale-[0.85] xl:scale-[0.95] 2xl:scale-[1.1] transition-transform duration-500">
                             <Board
                                 grid={game.board}
                                 validMoves={legalMoves?.positions || []}
@@ -207,7 +207,7 @@ const PlayPage: React.FC = () => {
                     </div>
 
                     {/* Hand Container (Fixed at bottom, no overlap) */}
-                    <div className="w-full h-40 shrink-0 bg-gradient-to-t from-slate-950 to-slate-900/50 flex flex-col justify-end pb-2 z-20 relative shadow-[0_-10px_40px_rgba(0,0,0,0.5)] pointer-events-none">
+                    <div className="w-full h-36 shrink-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex flex-col justify-end pb-4 z-20 relative pointer-events-none">
                         {/* Action Bar (Dead Card) */}
                         {isHumanTurn && selectedCardIdx !== null && (
                             <div className="absolute -top-12 left-1/2 -translate-x-1/2 flex items-center gap-4 animate-in slide-in-from-bottom-2 fade-in pointer-events-auto">

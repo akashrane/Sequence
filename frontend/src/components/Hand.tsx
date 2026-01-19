@@ -20,7 +20,7 @@ const Hand: React.FC<HandProps> = ({ cards, selectedIndex, onSelect, isCurrentPl
     };
 
     return (
-        <div className="relative flex justify-center items-end h-40 w-full perspective-500 pointer-events-none">
+        <div className="relative flex justify-center items-end h-36 w-full perspective-500 pointer-events-none">
             {cards.length === 0 && (
                 <div className="text-slate-500 font-mono text-sm border-2 border-dashed border-slate-800 rounded-lg p-4">
                     Empty Hand
@@ -49,7 +49,7 @@ const Hand: React.FC<HandProps> = ({ cards, selectedIndex, onSelect, isCurrentPl
                             whileHover={{ y: -20, rotate: 0, zIndex: 40, scale: 1.1 }}
                             onClick={() => isCurrentPlayer && onSelect(i)}
                             className={cn(
-                                "relative w-24 h-36 rounded-xl shadow-xl flex flex-col justify-between p-2 border transition-colors duration-200 cursor-pointer",
+                                "relative w-20 h-32 rounded-lg shadow-xl flex flex-col justify-between p-1.5 border transition-colors duration-200 cursor-pointer",
                                 // Material
                                 "bg-gradient-to-br from-slate-100 to-slate-300",
                                 isSelected ? "ring-4 ring-blue-500 ring-offset-2 ring-offset-slate-900 border-blue-400" : "border-slate-400",
@@ -59,8 +59,8 @@ const Hand: React.FC<HandProps> = ({ cards, selectedIndex, onSelect, isCurrentPl
                         >
                             {/* Top Left */}
                             <div className={cn("text-left leading-none", isRed ? "text-red-600" : "text-slate-900")}>
-                                <div className="font-bold text-lg">{rank}</div>
-                                <div className="text-xl">{suit}</div>
+                                <div className="font-bold text-base">{rank}</div>
+                                <div className="text-lg">{suit}</div>
                             </div>
 
                             {/* Center Big */}
@@ -70,8 +70,8 @@ const Hand: React.FC<HandProps> = ({ cards, selectedIndex, onSelect, isCurrentPl
 
                             {/* Bottom Right */}
                             <div className={cn("text-right leading-none rotate-180", isRed ? "text-red-600" : "text-slate-900")}>
-                                <div className="font-bold text-lg">{rank}</div>
-                                <div className="text-xl">{suit}</div>
+                                <div className="font-bold text-base">{rank}</div>
+                                <div className="text-lg">{suit}</div>
                             </div>
 
                             {/* Jack Tag */}

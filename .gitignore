@@ -1,7 +1,18 @@
+# Python
 __pycache__/
 *.pyc
 .pytest_cache/
 venv/
 env/
 .env
+
+# Node / Frontend
+node_modules/
+dist/
+build/
+.vercel/
+*.log
+
+# System
 .DS_Store
+Thumbs.db
