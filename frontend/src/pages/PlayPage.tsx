@@ -131,7 +131,7 @@ const PlayPage: React.FC = () => {
     const isHumanTurn = currentPlayer?.id === 0;
 
     return (
-        <div className="flex flex-col h-full overflow-hidden">
+        <div className="flex flex-col h-[calc(100vh-4rem)] overflow-hidden">
             {/* Ambient Glow */}
             <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-blue-500/10 blur-[120px] rounded-full pointer-events-none" />
 

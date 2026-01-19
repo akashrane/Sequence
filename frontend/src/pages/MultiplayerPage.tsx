@@ -43,7 +43,7 @@ const MultiplayerPage = () => {
     const isMyTurn = gameState && playerId !== null && gameState.currentPlayerId === playerId;
 
     return (
-        <div className="flex flex-col h-screen bg-slate-950 text-slate-100 overflow-hidden">
+        <div className="flex flex-col h-[calc(100vh-4rem)] bg-slate-950 text-slate-100 overflow-hidden">
             {/* Header */}
             <header className="relative z-10 w-full backdrop-blur-sm border-b border-white/5 bg-indigo-900/10">
                 <div className="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
