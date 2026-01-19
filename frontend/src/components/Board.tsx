@@ -7,11 +7,12 @@ interface BoardProps {
     grid: BoardCell[][];
     validMoves: { r: number, c: number }[];
     onCellClick: (r: number, c: number) => void;
+    ignoreValidation?: boolean;
 }
 
-const Board: React.FC<BoardProps> = ({ grid, validMoves, onCellClick }) => {
+const Board: React.FC<BoardProps> = ({ grid, validMoves, onCellClick, ignoreValidation }) => {
 
-    const isValid = (r: number, c: number) => validMoves.some(m => m.r === r && m.c === c);
+    const isValid = (r: number, c: number) => ignoreValidation || validMoves.some(m => m.r === r && m.c === c);
 
     return (
         <div className="perspective-1000 py-10 w-full flex justify-center">
@@ -26,9 +27,15 @@ const Board: React.FC<BoardProps> = ({ grid, validMoves, onCellClick }) => {
                 }}
             >
                 {/* Board Surface Texture */}
-                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/felt.png')] opacity-30 mix-blend-overlay pointer-events-none rounded-xl" />
+                <div className="pointer-events-none absolute inset-0 bg-amber-950 rounded-xl overflow-hidden">
+                    <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')] opacity-30 mix-blend-overlay" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-black/40 mix-blend-multiply" />
+                </div>
 
-                <div className="grid grid-cols-10 gap-1.5 transform-style-3d">
+                <div
+                    className="grid grid-cols-10 gap-1.5 transform-style-3d pointer-events-none"
+                    style={{ pointerEvents: 'none', transformStyle: 'preserve-3d' }}
+                >
                     {grid.map((row, r) => (
                         row.map((cell, c) => {
                             const valid = isValid(r, c);
@@ -49,18 +56,20 @@ const Board: React.FC<BoardProps> = ({ grid, validMoves, onCellClick }) => {
                                     key={`${r}-${c}`}
                                     whileHover={{ scale: 1.05, zIndex: 50, translateZ: 10 }}
                                     whileTap={{ scale: 0.95, translateZ: 5 }}
-                                    onClick={() => valid && onCellClick(r, c)}
+                                    onClick={() => onCellClick(r, c)}
                                     className={cn(
-                                        "relative w-9 h-12 sm:w-11 sm:h-14 lg:w-12 lg:h-16 flex items-center justify-center rounded-sm sm:rounded-md transition-all duration-200 transform-style-3d group",
+                                        "pointer-events-auto relative w-9 h-12 sm:w-11 sm:h-14 lg:w-12 lg:h-16 flex items-center justify-center rounded-sm sm:rounded-md transition-all duration-200 transform-style-3d group cursor-pointer",
                                         // Card Base Style
                                         cell.isCorner
                                             ? "bg-amber-900/80 border-amber-500/30"
-                                            : "bg-slate-200 border-slate-300 shadow-sm",
+                                            : "bg-slate-200 border-slate-300 shadow-sm hover:brightness-110",
 
-                                        valid ? "ring-2 ring-yellow-400 z-20 cursor-pointer" : "",
+                                        valid ? "ring-2 ring-yellow-400 z-20" : "",
                                     )}
                                     style={{
                                         boxShadow: cell.isCorner ? 'none' : '1px 1px 2px rgba(0,0,0,0.3)',
+                                        pointerEvents: 'auto',
+                                        zIndex: valid ? 60 : 1 // Ensure valid moves are higher, but base is clickable
                                     }}
                                 >
                                     {/* Card Face */}
@@ -116,8 +125,8 @@ const Board: React.FC<BoardProps> = ({ grid, validMoves, onCellClick }) => {
                                         )}
                                     </AnimatePresence>
 
-                                    {/* Valid Text? */}
-                                    {valid && !isOccupied && (
+                                    {/* Valid Text - Only show if in validMoves list (Visual Hint) */}
+                                    {validMoves.some(m => m.r === r && m.c === c) && !isOccupied && (
                                         <motion.div
                                             style={{ translateZ: 10 }}
                                             animate={{ y: [0, -5, 0] }}

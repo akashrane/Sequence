@@ -12,6 +12,8 @@ from engine.ai import SequenceAI
 from engine.simulation import SimulationRunner
 from backend.models import *
 from backend.store import games
+from backend.connection_manager import manager
+from fastapi import WebSocket, WebSocketDisconnect
 
 app = FastAPI(title="Sequence Game API")
 
@@ -207,6 +209,83 @@ def run_simulation(trials: int = Body(...), boardType: str = Body("standard"), a
         "avg_turns": avg_turns,
         "stats": df.to_dict(orient="records")
     }
+
+# --- Room / Multiplayer Endpoints ---
+
+@app.post("/api/rooms/create")
+async def create_room():
+    room_code = manager.create_room()
+    return {"roomCode": room_code}
+
+@app.websocket("/ws/{room_code}")
+async def websocket_endpoint(websocket: WebSocket, room_code: str):
+    room = manager.get_room(room_code)
+    if not room:
+        await websocket.close(code=4000, reason="Room not found")
+        return
+
+    await room.connect(websocket)
+    
+    try:
+        # Send initial state
+        await websocket.send_json({
+            "type": "STATE_UPDATE",
+            "state": serialize_state(room_code, room.game).dict()
+        })
+
+        while True:
+            data = await websocket.receive_json()
+            # Handle client events (MOVE, JOIN_TEAM, etc)
+            event_type = data.get("type")
+            
+            if event_type == "MOVE":
+                try:
+                    # Find player ID for this websocket
+                    player_id = -1
+                    for pid, ws in room.slots.items():
+                        if ws == websocket:
+                            player_id = pid
+                            break
+                    
+                    print(f"[DEBUG] MOVE Event from Socket. Found Player ID: {player_id}")
+                    
+                    if player_id == -1: 
+                        print("[DEBUG] Unknown socket, ignoring.")
+                        continue
+
+                    # Parse move
+                    card_index = data.get("cardIndex")
+                    target = data.get("target") # {r, c}
+                    
+                    current_turn_p = room.game.current_player.id
+                    print(f"[DEBUG] Current Turn: {current_turn_p}, Requesting Player: {player_id}")
+
+                    if target and card_index is not None:
+                        # Validate Turn
+                        if current_turn_p != player_id:
+                            print("[DEBUG] Not player's turn.")
+                            continue # Not their turn
+                        
+                        # Execute Move
+                        success = room.game.play_move(card_index, (target['r'], target['c']))
+                        print(f"[DEBUG] play_move result: {success}")
+                        
+                        if success:
+                            # Broadcast new state
+                            print("[DEBUG] Broadcasting State Update")
+                            await room.broadcast({
+                                "type": "STATE_UPDATE",
+                                "state": serialize_state(room_code, room.game).dict()
+                            })
+                        else:
+                            print("[DEBUG] Move invalid according to engine.")
+                except Exception as e:
+                    print(f"[ERROR] Exception processing MOVE: {e}")
+                    import traceback
+                    traceback.print_exc()
+                
+    except WebSocketDisconnect:
+        room.disconnect(websocket)
 
 if __name__ == "__main__":
     import uvicorn

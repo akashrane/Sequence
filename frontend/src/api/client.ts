@@ -71,5 +71,10 @@ export const api = {
     simulate: async (trials: number) => {
         const res = await axios.post(`${API_Base}/simulate/monte-carlo`, { trials, boardType: "standard", aiLevel: "smart" });
         return res.data;
+    },
+    // Multiplayer
+    createRoom: async () => {
+        const res = await axios.post<{ roomCode: string }>(`${API_Base}/rooms/create`);
+        return res.data;
     }
 };

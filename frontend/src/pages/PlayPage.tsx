@@ -107,11 +107,18 @@ const PlayPage: React.FC = () => {
     };
 
     const handleBoardClick = (r: number, c: number) => {
-        if (selectedCardIdx !== null) {
-            moveMut.mutate({ r, c });
-        } else {
+        if (selectedCardIdx === null) {
             toast("Select a card first", "info");
+            return;
         }
+
+        const isValid = legalMoves?.positions.some(m => m.r === r && m.c === c);
+        if (!isValid) {
+            toast("Invalid placement", "error");
+            return;
+        }
+
+        moveMut.mutate({ r, c });
     };
 
     if (isLoading || !game) return (
@@ -172,9 +179,10 @@ const PlayPage: React.FC = () => {
 
             <div className="relative z-10 flex-1 grid grid-cols-1 lg:grid-cols-[1fr_350px] overflow-hidden">
 
-                {/* Left: Game Area (Huge Board) */}
-                <div className="relative flex items-center justify-center bg-radial-gradient from-blue-900/20 to-slate-950 overflow-hidden">
-                    {/* Winner Banner */}
+                {/* Left: Game Area (Flex Column) */}
+                <div className="relative flex flex-col items-center bg-radial-gradient from-blue-900/20 to-slate-950 overflow-hidden">
+
+                    {/* Winner Banner (Overlay) */}
                     {game.winnerTeam !== null && (
                         <div className="absolute inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in">
                             <div className="bg-slate-900 border-2 border-emerald-500 p-8 rounded-2xl shadow-2xl text-center">
@@ -186,23 +194,26 @@ const PlayPage: React.FC = () => {
                         </div>
                     )}
 
-                    {/* Board */}
-                    <div className="scale-[0.65] sm:scale-[0.8] lg:scale-[1.0] xl:scale-[1.1] 2xl:scale-[1.25] origin-center transition-transform duration-500 pb-24 lg:pb-0">
-                        <Board
-                            grid={game.board}
-                            validMoves={legalMoves?.positions || []}
-                            onCellClick={handleBoardClick}
-                        />
+                    {/* Board Area (Takes remaining space) */}
+                    <div className="flex-1 w-full flex items-center justify-center p-4 overflow-hidden relative">
+                        {/* Scale wrapper */}
+                        <div className="scale-[0.6] sm:scale-[0.75] md:scale-[0.85] lg:scale-[1.0] xl:scale-[1.1] 2xl:scale-[1.25] transition-transform duration-500">
+                            <Board
+                                grid={game.board}
+                                validMoves={legalMoves?.positions || []}
+                                onCellClick={handleBoardClick}
+                            />
+                        </div>
                     </div>
 
-                    {/* Hand Container (Floating at bottom) */}
-                    <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent flex flex-col justify-end pb-2">
+                    {/* Hand Container (Fixed at bottom, no overlap) */}
+                    <div className="w-full h-40 shrink-0 bg-gradient-to-t from-slate-950 to-slate-900/50 flex flex-col justify-end pb-2 z-20 relative shadow-[0_-10px_40px_rgba(0,0,0,0.5)] pointer-events-none">
                         {/* Action Bar (Dead Card) */}
                         {isHumanTurn && selectedCardIdx !== null && (
-                            <div className="absolute top-0 left-1/2 -translate-x-1/2 flex items-center gap-4 animate-in slide-in-from-bottom-2 fade-in">
+                            <div className="absolute -top-12 left-1/2 -translate-x-1/2 flex items-center gap-4 animate-in slide-in-from-bottom-2 fade-in pointer-events-auto">
                                 <button
                                     onClick={() => deadCardMut.mutate()}
-                                    className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/50 rounded-full flex items-center gap-2 text-sm font-bold backdrop-blur-md transition-all"
+                                    className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/50 rounded-full flex items-center gap-2 text-sm font-bold backdrop-blur-md transition-all shadow-lg"
                                 >
                                     <Trash2 size={16} />
                                     Exchange Dead Card
@@ -210,7 +221,7 @@ const PlayPage: React.FC = () => {
                             </div>
                         )}
 
-                        <div className="w-full max-w-4xl mx-auto px-4">
+                        <div className="w-full max-w-4xl mx-auto px-4 z-20">
                             {isHumanTurn ? (
                                 <Hand
                                     cards={currentPlayer?.hand || []}
