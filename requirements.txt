@@ -3,3 +3,8 @@ pandas
 numpy
 pytest
 altair
+fastapi
+uvicorn
+pydantic
+websockets
+python-multipart
